@@ -57,7 +57,7 @@ Send the token on subsequent requests:
 Authorization: Bearer <access_token>
 ```
 
-Tokens are valid for **15 minutes** (`expires_in: 900`), not 24 hours. The refresh flow is present to maintain the session.
+Tokens are valid for **15 minutes** (`expires_in: 900`). The refresh flow is present to maintain the session.
 
 #### `POST /auth/refresh`
 
