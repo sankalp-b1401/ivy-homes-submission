@@ -29,6 +29,15 @@
       "evidence": [
         "Using a query parameter returns {\"detail\": \"send your key in the X-API-Key request header, not as a query parameter\"}"
       ]
+    },
+    {
+      "endpoint": "/auth/login",
+      "category": "auth",
+      "documented": "Login response has field 'token', expires_in 86400 (24h), user object contains 'name', and 'there is no refresh flow'",
+      "actual": "Login response field is 'access_token' (not 'token'), expires_in is 900 (15min), user object has no 'name' field, and a refresh flow exists via 'refresh_token'",
+      "how_found": "called POST /auth/login and compared the actual response structure against the documented one, then tested POST /auth/refresh with the returned refresh_token",
+      "impact": "frontend must use 'access_token' field, implement token refresh every 15 minutes via /auth/refresh, and cannot rely on a user 'name' field",
+      "evidence": []
     }
   ]
 }

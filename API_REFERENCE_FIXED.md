@@ -21,7 +21,7 @@ Two things identify a request.
 Every request must carry the API key you were issued. Send it as a request
 header:
 
-```
+```json
 X-API-Key: IVY26-XXXXXXXXXXXX
 ```
 
@@ -42,21 +42,30 @@ Your frontend must log an end user in.
 
 ```json
 {
-  "token": "eyJhbGciOi...",
+  "access_token": "eyJ...",
+  "refresh_token": "eyJ...",
   "token_type": "Bearer",
-  "expires_in": 86400,
-  "user": { "email": "demo1@ivy.homes", "name": "Demo User" }
+  "expires_in": 900,
+  "refresh_url": "/auth/refresh",
+  "user": { "email": "demo1@ivy.homes" }
 }
 ```
 
 Send the token on subsequent requests:
 
 ```
-Authorization: Bearer <token>
+Authorization: Bearer <access_token>
 ```
 
-Tokens are valid for 24 hours, so a single login is enough for one working
-session. There is no refresh flow.
+Tokens are valid for **15 minutes** (`expires_in: 900`), not 24 hours. The refresh flow is present to maintain the session.
+
+#### `POST /auth/refresh`
+
+Refreshes the `access_token` every 15 minutes (age of token):
+
+```
+refresh_token: <refresh_token from login or previous refresh>
+```
 
 #### `POST /auth/logout`
 
