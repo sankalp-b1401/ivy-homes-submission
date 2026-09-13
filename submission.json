@@ -38,6 +38,17 @@
       "how_found": "called POST /auth/login and compared the actual response structure against the documented one, then tested POST /auth/refresh with the returned refresh_token",
       "impact": "frontend must use 'access_token' field, implement token refresh every 15 minutes via /auth/refresh, and cannot rely on a user 'name' field",
       "evidence": []
+    },
+    {
+      "endpoint": "/auth/logout",
+      "category": "auth",
+      "documented": "POST /auth/logout invalidates the current token server side",
+      "actual": "Tokens are stateless and discarded on client side. Discarded tokens remain valid until expiry (15 min) and refresh tokens until their expiry (7 days), even after logout is called",
+      "how_found": "called POST /auth/logout, observed the response note about stateless tokens, then verified by using the 'discarded' access_token on GET /v1/listings (still worked), waiting for access_token expiry, and using the 'discarded' refresh_token on POST /auth/refresh (still generated new tokens)",
+      "impact": "logout is client-side only — clear tokens from storage. No server-side revocation exists. Refresh tokens remain usable for 7 days from issue regardless of logout",
+      "evidence": [
+        "Logout returns {\"ok\": true, \"note\": \"tokens are stateless; discard them client side\"}"
+      ]
     }
   ]
 }

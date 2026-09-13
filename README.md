@@ -8,7 +8,7 @@ Read the documentation at every step -> Test the claim ? If VALID move on : If I
 
 ### Findings:
 
-**1. Description of attaching API Key with every request was wrong: **
+**1. Description of attaching API Key with every request was wrong:**
 
 Sending the key as a query parameter (`?api_key=...`) does **not** work. The API returns an error:
 
@@ -37,7 +37,7 @@ Response
 
 ---
 
-**2. Invalid `/auth/login` response structure and description: **
+**2. Invalid `/auth/login` response structure and description:**
 
 The document claims:
 
@@ -85,3 +85,76 @@ But after authentication, this was the actual response I recieved:
 ```
 
 (iv) Lastly the `user` field only contains `email` parameter (no `name` parameter).
+
+**3. `/auth/logout` does not invalidate token on server-side:**
+
+This one was little complicated. When I acceseed the `/auth/logout` endpoint via:
+
+```bash
+ curl.exe -X POST -H "X-API-Key: $API_KEY" -H "Authorization: Bearer eyJleHAiOjE3ODkzMDcwMjksImlhdCI6MTc4OTMwNjEyOSwia2V5IjoiSVZZMjYtQ0EyNzQwNEVFN0M5Iiwic3ViIjoiZGVtbzFAaXZ5LmhvbWVzIiwidHlwIjoiYWNjZXNzIn0.yVIzzPN4rn1rv2SPjX_PuZyhvkEOwLRVbAOfg8HGKD0" https://solve.ivy.homes/auth/logout
+```
+
+I received the error message that revealed that tokens have to be discarded the client side.
+
+```json
+{ "ok": true, "note": "tokens are stateless; discard them client side" }
+```
+
+So the claim documentation makes about token being discarded at server-side is wrong.
+
+There's one more thing I checked before moving forward and it was how is the server responding to expired tokens. Because even if the frontend code handles the tokens from client-side, there's a possibility that I can copy the token before discarding it. Discarding from client-side simply means browser stops storing the `access_token` in it's local storage. I had two observations:
+
+1. The server continues to support the discarded `access_token` as long as they are not expired.
+2. The behavior is same for the `refresh_token`. But because an expired `refresh_token` is still usable, it can be used to generate new `access_tokens` even if the current one expires.
+
+This ends when the `refresh_token` is expired itself. The tokens here are in form: PAYLOAD.SIGNATURE so I decoded the payload part for a `refresh_token`:
+
+```json
+"refresh_token":"eyJleHAiOjE3ODk5MjYzNjEsImlhdCI6MTc4OTMyMTU2MSwia2V5IjoiSVZZMjYtQ0EyNzQwNEVFN0M5Iiwic3ViIjoiZGVtbzFAaXZ5LmhvbWVzIiwidHlwIjoicmVmcmVzaCJ9.CPEcF1GEsUINpAY53SNx2VfLo0o6wMVK-zRuGkTlhsg"
+```
+
+Here:
+
+```json
+PAYLOAD = "eyJleHAiOjE3ODk5MjYzNjEsImlhdCI6MTc4OTMyMTU2MSwia2V5IjoiSVZZMjYtQ0EyNzQwNEVFN0M5Iiwic3ViIjoiZGVtbzFAaXZ5LmhvbWVzIiwidHlwIjoicmVmcmVzaCJ9"
+SIGNATURE = "CPEcF1GEsUINpAY53SNx2VfLo0o6wMVK-zRuGkTlhsg"
+```
+
+On decoding the payload, I got:
+
+```json
+{
+  "exp": 1789926361,
+  "iat": 1789321561,
+  "key": "IVY26-CA27404EE7C9",
+  "sub": "demo1@ivy.homes",
+  "typ": "refresh"
+}
+```
+
+> $$1789926361 - 1789321561 = 604800 seconds = 7 days$$
+
+Therefore, the `refresh_token` expires **after 7 days** so until then even if a token is discarded from client side. I reached this hypothesis by testing the endpoints with the following procedure:
+
+1. POST `/auth/login` to generate a new `acess_token` and `refresh_token`.
+2. POST `/auth/logout` to discard token from client side. (I do this step before the `access_token` expires)
+3. GET `/v1/listings` and use the discarded `access_token` (not yet expired) in the `Authorization` header. As I stated above, the token successfully authorized me and fetched the data.
+4. Repeat step 3 after 15 minutes (when the `access_token` has expired). In this case the request failed and I received the message: `{"detail":"access token expired - POST /auth/refresh with your refresh_token"}`
+5. Once the `access_token` expires, it can not be used again, but the `refresh_token` is still not expired (7 days age) even though we discarded the tokens. So, POST `/auth/refresh` with `refresh_token` in the request body. I was able to generate a new `access_token`:
+
+```bash
+curl.exe -X POST -H "X-API-Key: $API_KEY" -H "Content-Type: application/json" -d '{\"refresh_token\": \"eyJleHAiOjE3ODk5MjYzNjEsImlhdCI6MTc4OTMyMTU2MSwia2V5IjoiSVZZMjYtQ0EyNzQwNEVFN0M5Iiwic3ViIjoiZGVtbzFAaXZ5LmhvbWVzIiwidHlwIjoicmVmcmVzaCJ9.CPEcF1GEsUINpAY53SNx2VfLo0o6wMVK-zRuGkTlhsg\"}' https://solve.ivy.homes/auth/refresh
+```
+
+```json
+{
+  "access_token": "eyJleHAiOjE3ODkzMjUwODIsImlhdCI6MTc4OTMyNDE4Miwia2V5IjoiSVZZMjYtQ0EyNzQwNEVFN0M5Iiwic3ViIjoiZGVtbzFAaXZ5LmhvbWVzIiwidHlwIjoiYWNjZXNzIn0.8CiBJ6tnwGjiGMeQaSg_Qwi8DcHlj3ASE7d2Zk-NZHg",
+  "refresh_token": "eyJleHAiOjE3ODk5Mjg5ODIsImlhdCI6MTc4OTMyNDE4Miwia2V5IjoiSVZZMjYtQ0EyNzQwNEVFN0M5Iiwic3ViIjoiZGVtbzFAaXZ5LmhvbWVzIiwidHlwIjoicmVmcmVzaCJ9.BhU70o0XXiRc_HJMqiOa1SRb8wZisgoeR0CExprvDps",
+  "token_type": "Bearer",
+  "expires_in": 900,
+  "refresh_url": "/auth/refresh",
+  "user": { "email": "demo1@ivy.homes" }
+}
+```
+
+6. Repeat Step 3 with the new `access_token`. As suspected, I was able to fetch data from the endpoint.

@@ -69,7 +69,18 @@ refresh_token: <refresh_token from login or previous refresh>
 
 #### `POST /auth/logout`
 
-Invalidates the current token server side.
+Tokens are stateless and discarded on client-side.
+
+Returns:
+
+```json
+{ "ok": true, "note": "tokens are stateless; discard them client side" }
+```
+
+The `access_token` remains valid until its `exp` (15 min from issue), and the
+`refresh_token` remains valid until its `exp` (**7 days** from issue), regardless
+of whether logout was called. Logout is purely a client-side operation — clear
+the tokens from storage.
 
 Three demo accounts exist: `demo1@ivy.homes`, `demo2@ivy.homes`,
 `demo3@ivy.homes`. They share the password issued with your key.
