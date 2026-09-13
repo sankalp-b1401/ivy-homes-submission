@@ -1,0 +1,34 @@
+{
+  "api_key": "IVY26-XXXXXXXXXXX",
+  "candidate": {
+    "name": "Sankalp Bansal",
+    "email": "sankalp.b2027@gmail.com",
+    "repo_url": "https://github.com/sankalp-b1401/ivy-homes-submission",
+    "demo_url": ""
+  },
+  "answers": {
+    "total_listing_records": 0,
+    "unique_properties": 0,
+    "active_listings": 0,
+    "corrupt_listing_ids": [],
+    "total_monthly_rent": 0,
+    "avg_price_per_sqft_2bhk": 0.0,
+    "costliest_project": { "project_id": "", "price_max_inr": 0 },
+    "listings_last_7_days": 0,
+    "fake_listing_ids": [],
+    "projects_with_wrong_listing_count": 0
+  },
+  "findings": [
+    {
+      "endpoint": "*",
+      "category": "auth",
+      "documented": "API key is sent as a query parameter: ?api_key=IVY26-XXXXXXXXXXXX",
+      "actual": "API key must be sent as a request header: X-API-Key: IVY26-XXXXXXXXXXXX.",
+      "how_found": "first API call using the documented query parameter method returned an error with explicit instructions to use the header instead",
+      "impact": "every request must use the X-API-Key header; the documented method fails on all endpoints",
+      "evidence": [
+        "Using a query parameter returns {\"detail\": \"send your key in the X-API-Key request header, not as a query parameter\"}"
+      ]
+    }
+  ]
+}
