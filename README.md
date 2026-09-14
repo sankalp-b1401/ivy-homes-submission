@@ -1,3 +1,25 @@
+# Ivy Homes — Property Portal & API Audit
+
+## How to Run the App
+
+The web application is deployed on Vercel: 
+
+
+1. **Visit the website at this URL**: https://sankalp-ivy-homes.vercel.app/
+2. **Enter user name and password**:
+   - **User Name**: `demo1@ivy.homes` (or `demo2@ivy.homes` / `demo3@ivy.homes`)
+   - **Password**: `70086d1d16`
+
+*(To run locally)*:
+```bash
+cd frontend
+npm install
+npm run dev
+```
+Open `http://localhost:3000` in your browser.
+
+---
+
 ## API Documentation Alignment Logs
 
 ### Approach
