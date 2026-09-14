@@ -1,0 +1,8 @@
+{
+  "name": "Remix Remix Ivy Homes Portal",
+  "description": "Modern real-estate application frontend built in React + TypeScript.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
