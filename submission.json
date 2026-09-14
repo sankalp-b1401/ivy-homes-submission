@@ -103,6 +103,15 @@
       "how_found": "discovered while testing the documented singular path which returned 404 — tried the plural form and it worked",
       "impact": "this is the correct endpoint to use for listing detail pages",
       "evidence": []
+    },
+    {
+      "endpoint": "/v1/rentals",
+      "category": "completeness",
+      "documented": "Supports page, limit, locality, bhk, furnishing, sort_by, order — filters listed inline without detail, sort_by options not specified",
+      "actual": "Supports offset (not page), limit, locality, bhk, furnishing, sort_by, order. sort_by accepts: price, deposit, posted_at, bedroom, carpet_area",
+      "how_found": "tested all filter parameters on /v1/rentals. Confirmed page does not exist (uses offset like listings). Tested sort_by with various field names to determine which are accepted",
+      "impact": "frontend must use offset-based pagination for rentals and can sort by deposit and carpet_area in addition to the obvious fields",
+      "evidence": []
     }
   ]
 }

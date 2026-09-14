@@ -206,8 +206,18 @@ A single listing. Same object as above.
 
 ### `GET /v1/rentals`
 
-Rental listings in your city. Supports `page`, `limit`, `locality`, `bhk`,
-`furnishing`, `sort_by`, `order`.
+Rental listings in your city.
+
+**Query parameters**
+
+| Parameter         | Type   | Notes                                                     |
+| ----------------- | ------ | --------------------------------------------------------- |
+| `offset`, `limit` | int    | See Pagination                                            |
+| `locality`        | string | Exact match, lowercase                                    |
+| `bhk`             | int    | Number of bedrooms                                        |
+| `furnishing`      | string | `unfurnished`, `semi-furnished`, `fully-furnished`        |
+| `sort_by`         | string | `price`, `deposit`, `posted_at`, `bedroom`, `carpet_area` |
+| `order`           | string | `asc` (default) or `desc`                                 |
 
 ```json
 {

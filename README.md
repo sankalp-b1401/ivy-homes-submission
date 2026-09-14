@@ -211,3 +211,10 @@ which fetches the listing based on the unique ID.
 > GET /v1/listings/{listing_id}/similar
 
 I tried reaching this endpoint and some alternate endpionts but this route does not exist and neither any alternate routes present for this functionality. It has to accomplished from client-side.
+
+**8. Incomplete `/v1/rentals` Filter Descriptions:**
+The documentation mentions the filters but does not describe them properly. They behave almost like the `v1/listings` filters but has some differences.
+
+(i) This endpoint supports: `limit, offset, locality, bhk, furnishing, sort_by, order`. There is no `pages` filter.
+
+(ii) `sort_by` can filter based on `price, deposit, posted_at, bedroom, carpet_area`
