@@ -49,6 +49,15 @@
       "evidence": [
         "Logout returns {\"ok\": true, \"note\": \"tokens are stateless; discard them client side\"}"
       ]
+    },
+    {
+      "endpoint": "/v1/listings",
+      "category": "completeness",
+      "documented": "Returns only active sale listings; inactive, expired and withdrawn listings are excluded server side. Listing object does not include an is_live field",
+      "actual": "Returns all listings including inactive ones. Each listing has an is_live boolean field indicating whether it is currently active.",
+      "how_found": "fetched listings and observed an undocumented is_live field in every listing object, with some listings having is_live: false — contradicting the claim that inactive listings are excluded",
+      "impact": "frontend must filter listings by is_live: true before displaying to users. Total record count from the endpoint includes inactive listings",
+      "evidence": []
     }
   ]
 }

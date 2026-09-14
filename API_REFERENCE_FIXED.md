@@ -69,7 +69,7 @@ refresh_token: <refresh_token from login or previous refresh>
 
 #### `POST /auth/logout`
 
-Tokens are stateless and discarded on client-side.
+Tokens are stateless and are discarded on client-side.
 
 Returns:
 
@@ -78,7 +78,7 @@ Returns:
 ```
 
 The `access_token` remains valid until its `exp` (15 min from issue), and the
-`refresh_token` remains valid until its `exp` (**7 days** from issue), regardless
+`refresh_token` also remains valid until its `exp` (**7 days** from issue), regardless
 of whether logout was called. Logout is purely a client-side operation — clear
 the tokens from storage.
 
@@ -126,9 +126,8 @@ record, read `total`, divide by your `limit`, and request that many pages.
 
 ### `GET /v1/listings`
 
-Returns **active** sale listings in your city. Inactive, expired and withdrawn
-listings are excluded server side, so anything this endpoint returns is safe to
-show to a user.
+Returns sale listings in your city, including inactive ones. Use `is_live` to
+filter for active listings on the client side.
 
 Every `listing_id` is globally unique, and each listing corresponds to exactly
 one physical property.
@@ -157,42 +156,44 @@ GET /v1/listings?locality=koramangala&bhk=3&min_price=15000000&order=desc&sort_b
 
 ```json
 {
-  "listing_id": "100-1000042",
-  "listing_url": "https://www.100acres.com/property/1000042",
-  "website": "100acres",
+  "listing_id": "MAG-1002627",
+  "listing_url": "https://www.magichomes.com/property/1002627",
+  "website": "magichomes",
   "city_id": 1,
-  "apartment_name": "Prestige Lakeside Habitat",
-  "locality": "whitefield",
-  "property_type": "apartment",
-  "bedroom": 3,
-  "bathroom": 3,
-  "balcony": 2,
-  "floor": 7,
-  "total_floors": 18,
-  "furnishing": "semi-furnished",
+  "apartment_name": "Kolte Patil Vista",
+  "locality": "koramangala",
+  "property_type": "independent house",
+  "bedroom": 4,
+  "bathroom": 4,
+  "balcony": 1,
+  "floor": 22,
+  "total_floors": 24,
+  "furnishing": "fully-furnished",
   "facing_direction": "north-east",
-  "covered_parking": 1,
-  "price": 14500000,
-  "carpet_area": 1240,
-  "super_built_up_area": 1620,
-  "latitude": 12.97161,
-  "longitude": 77.59461,
-  "posted_by": "agent",
-  "posted_by_name": "Rahul Sharma",
-  "posted_by_contact": "+912001234567",
-  "project_id": "P10001",
-  "description": "Corner 3 BHK apartment in Prestige Lakeside Habitat, Whitefield. Semi-furnished, north-east-facing.",
-  "posted_at": "2026-06-14T09:20:00Z",
-  "is_verified": true
+  "covered_parking": 2,
+  "price": 27410000,
+  "carpet_area": 154,
+  "super_built_up_area": 223,
+  "latitude": 13.10962,
+  "longitude": 77.43783,
+  "posted_by": "owner",
+  "posted_by_name": "Manish Kumar",
+  "posted_by_contact": "+912007140049",
+  "project_id": null,
+  "is_verified": true,
+  "description": "Sunlit 4 BHK independent house in Kolte Patil Vista, Koramangala. Fully-furnished, north-east-facing. Gated society with security; quiet lane with no through traffic.",
+  "posted_at": "2026-06-14T21:03:00Z",
+  "is_live": true
 }
 ```
 
 `posted_by_contact` is the seller's verified contact number. `description` is
 the seller's own text, shown as written.
 
-`is_verified` means our operations team has checked the listing. `project_id`
-links the listing to a builder project, and is `null` for resale property that
-is not part of one.
+`is_verified` means our operations team has checked the listing. `is_live`
+indicates whether the listing is currently active. `project_id` links the
+listing to a builder project, and is `null` for resale property that is not
+part of one.
 
 ### `GET /v1/listing/{listing_id}`
 
