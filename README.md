@@ -258,3 +258,16 @@ This is identical to finding 4. Here's the actual rental object:
 (i) Under the `v1/projects` documentation, it is claimed `total_listing` stays in sync with the response from `GET /v1/listings?project_id=...` but `project_id` filter fails silently and does not return the expected results.
 
 (ii) `page` filter does not exist. `offsest` and `limit` are used together for pagination. Other parameters are correct.
+
+**11. No `/v1/favourites` endpoint exist:**
+I tried probing `/v1/favourites` but it kept on returning: `{"details": "not found"}`. So I tried: `favourite, favorite, favorites` but none of them worked. I intuitively tried `saved` because that is the closest naming convention to what this endpoint is meant to do and it worked.
+
+Instead `v1/saved` endpoint exists and supports GET, POST and DELETE actions.
+
+POST `/v1/saved` requires:
+
+```json
+{"listing_id" = "..."}
+```
+
+The response structure is same as described in `/v1/favourites`.

@@ -130,6 +130,24 @@
       "how_found": "tested pagination with page vs offset/limit on /v1/projects, and verified that GET /v1/listings?project_id={id} silently ignores the parameter and returns unfiltered listings",
       "impact": "projects must be paginated using offset/limit. Listing counts per project cannot be fetched via project_id filter and must be aggregated client-side",
       "evidence": []
+    },
+    {
+      "endpoint": "/v1/favourites",
+      "category": "missing_endpoint",
+      "documented": "GET/POST/DELETE /v1/favourites for saving listings. POST body uses {\"id\": \"...\"}",
+      "actual": "/v1/favourites does not exist (returns 404). The correct endpoint is /v1/saved (GET, POST, DELETE). POST body uses {\"listing_id\": \"...\"} instead of {\"id\": \"...\"}",
+      "how_found": "called /v1/favourites and got 404. Tried /favourite, /favorite, /favorites — all 404. Tried /v1/saved intuitively and it worked",
+      "impact": "frontend must use /v1/saved for all saved listing operations, and POST with listing_id field",
+      "evidence": []
+    },
+    {
+      "endpoint": "/v1/saved",
+      "category": "undocumented_endpoint",
+      "documented": "The documentation only describes /v1/favourites for managing saved listings",
+      "actual": "GET, POST, and DELETE /v1/saved exists and is the working endpoint for managing saved listings. It accepts {\"listing_id\": \"...\"} on POST and {listing_id} as path parameter on DELETE",
+      "how_found": "tested /v1/saved after discovering /v1/favourites returned 404; confirmed it handles saved listings operations",
+      "impact": "frontend must use /v1/saved to implement user favourites/saved listings functionality",
+      "evidence": []
     }
   ]
 }

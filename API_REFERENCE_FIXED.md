@@ -312,11 +312,11 @@ A single project.
 
 ---
 
-## Favourites
+## Saved Listings
 
 A logged-in user can save listings.
 
-### `GET /v1/favourites`
+### `GET /v1/saved`
 
 ```json
 {
@@ -327,13 +327,13 @@ A logged-in user can save listings.
 }
 ```
 
-### `POST /v1/favourites`
+### `POST /v1/saved`
 
 ```json
-{ "id": "100-1000042" }
+{ "listing_id": "100-1000042" }
 ```
 
-### `DELETE /v1/favourites/{id}`
+### `DELETE /v1/saved/{listing_id}`
 
 ---
 
