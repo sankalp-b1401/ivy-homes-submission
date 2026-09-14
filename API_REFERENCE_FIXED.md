@@ -296,9 +296,7 @@ Builder projects in your city. Supports `page`, `limit`, `locality`,
 
 `price_min` and `price_max` are in rupees.
 
-`total_listings` is the number of listings currently available in the project.
-It is recomputed whenever a listing is added or withdrawn, so it always agrees
-with what `GET /v1/listings?project_id=...` returns.
+`total_listings` is the number of listings reported for the project.
 
 ### `GET /v1/projects/{project_id}`
 

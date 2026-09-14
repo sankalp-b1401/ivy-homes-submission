@@ -121,6 +121,15 @@
       "how_found": "fetched rentals and observed the is_live field in every rental object, identical to the listing endpoint behavior (finding 4)",
       "impact": "frontend must filter rentals by is_live: true before displaying to users",
       "evidence": []
+    },
+    {
+      "endpoint": "/v1/listings",
+      "category": "filters",
+      "documented": "GET /v1/listings?project_id=... filters listings by project, and total_listings on each project always agrees with this filtered count",
+      "actual": "project_id is not a supported filter on /v1/listings — the parameter is silently ignored and returns unfiltered results. The total_listings claim cannot be verified via this route",
+      "how_found": "called GET /v1/listings?project_id={id} and observed it returned the same unfiltered results regardless of the project_id value",
+      "impact": "to count listings per project, must filter client-side by matching project_id field in listing objects",
+      "evidence": []
     }
   ]
 }

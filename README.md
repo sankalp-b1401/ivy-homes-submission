@@ -253,3 +253,6 @@ This is identical to finding 4. Here's the actual rental object:
   "is_live": true
 }
 ```
+
+**10. GET /v1/listings?project_id=... fails silently:**
+Under the `v1/projects` documentation, `total_listing` stays in sync with the response from `GET /v1/listings?project_id=...` but `project_id` filter fails silently and does not return the expected results.
