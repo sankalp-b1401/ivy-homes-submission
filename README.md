@@ -174,3 +174,21 @@ The `listing` object structure defined in the documentation does not contain the
 ```
 
 As per the documentation `v1/listings` return only the **active** listings and is thus safe to show the results directly to the user. But based on my hypothesis the API response says otherwise and we would therefore have to filter the listing on client-side to only display the `is_live: true` listings.
+
+**5. Incorrect pagination mechanism:**
+The actual response from `/v1/listings` look like this:
+
+```json
+{
+  "limit": 20,
+  "offset": 0,
+  "count": 20,
+  "total": 4354,
+  "has_more": true,
+  "results": [...]
+}
+```
+
+(i) The `limit` field's default value is 20 and I tested setting it to 200 but it saturated at 50. So the maximum value is 50.
+(ii) There is no `page` field. The pagination behaviour can be achieved via `offset`. An `offset=X` fetches the listing starting from index X (the listing object list is 0-indexed that is why offset = 0 is the default value). So to fetch all the data (which I did using a bash script), set `?limit=50` and increment `offset` by multiples of 50 after each request.
+(iii) The `count` field tells us the number of entries fetched in the request.

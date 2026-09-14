@@ -99,26 +99,30 @@ Three demo accounts exist: `demo1@ivy.homes`, `demo2@ivy.homes`,
 
 ### Pagination
 
-Every collection endpoint takes `page` and `limit`.
+Every collection endpoint takes `offset` and `limit`.
 
-| Parameter | Type | Default | Notes         |
-| --------- | ---- | ------- | ------------- |
-| `page`    | int  | `1`     | 1-indexed     |
-| `limit`   | int  | `20`    | Maximum `200` |
+| Parameter | Type | Default | Notes        |
+| --------- | ---- | ------- | ------------ |
+| `offset`  | int  | `0`     | 0-indexed    |
+| `limit`   | int  | `20`    | Maximum `50` |
 
 Collection responses are shaped:
 
 ```json
 {
-  "total": 1240,
-  "page": 1,
-  "page_size": 20,
+  "limit": 20,
+  "offset": 0,
+  "count": 20,
+  "total": 4354,
+  "has_more": true,
   "results": [ ... ]
 }
 ```
 
-`total` is the exact number of records matching your filters. To fetch every
-record, read `total`, divide by your `limit`, and request that many pages.
+`total` is the exact number of records matching your filters. `count` is the
+number of records returned in this response. `has_more` indicates whether more
+records exist beyond the current offset. To fetch all records, set `limit=50`
+and increment `offset` by 50 after each request until `has_more` is `false`.
 
 ---
 
@@ -134,17 +138,17 @@ one physical property.
 
 **Query parameters**
 
-| Parameter       | Type   | Notes                                                              |
-| --------------- | ------ | ------------------------------------------------------------------ |
-| `page`, `limit` | int    | See Pagination                                                     |
-| `locality`      | string | Exact match, lowercase                                             |
-| `bhk`           | int    | Number of bedrooms                                                 |
-| `property_type` | string | `apartment`, `villa`, `independent house`, `plot`, `builder floor` |
-| `min_price`     | int    | Rupees, inclusive                                                  |
-| `max_price`     | int    | Rupees, inclusive                                                  |
-| `furnishing`    | string | `unfurnished`, `semi-furnished`, `fully-furnished`                 |
-| `sort_by`       | string | `price`, `carpet_area`, `posted_at`, `bedroom`                     |
-| `order`         | string | `asc` (default) or `desc`                                          |
+| Parameter         | Type   | Notes                                                              |
+| ----------------- | ------ | ------------------------------------------------------------------ |
+| `offset`, `limit` | int    | See Pagination                                                     |
+| `locality`        | string | Exact match, lowercase                                             |
+| `bhk`             | int    | Number of bedrooms                                                 |
+| `property_type`   | string | `apartment`, `villa`, `independent house`, `plot`, `builder floor` |
+| `min_price`       | int    | Rupees, inclusive                                                  |
+| `max_price`       | int    | Rupees, inclusive                                                  |
+| `furnishing`      | string | `unfurnished`, `semi-furnished`, `fully-furnished`                 |
+| `sort_by`         | string | `price`, `carpet_area`, `posted_at`, `bedroom`                     |
+| `order`           | string | `asc` (default) or `desc`                                          |
 
 **Example**
 

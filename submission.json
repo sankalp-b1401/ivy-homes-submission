@@ -58,6 +58,15 @@
       "how_found": "fetched listings and observed an undocumented is_live field in every listing object, with some listings having is_live: false — contradicting the claim that inactive listings are excluded",
       "impact": "frontend must filter listings by is_live: true before displaying to users. Total record count from the endpoint includes inactive listings",
       "evidence": []
+    },
+    {
+      "endpoint": "*",
+      "category": "pagination",
+      "documented": "Pagination uses page (1-indexed, default 1) and limit (default 20, max 200). Response contains total, page, page_size, results",
+      "actual": "Pagination uses offset (0-indexed, default 0) and limit (default 20, max 50). Response contains limit, offset, count, total, has_more, results. There is no page parameter",
+      "how_found": "fetched /v1/listings and observed the response shape uses offset/count/has_more instead of page/page_size. Tested limit=200 which saturated at 50",
+      "impact": "all collection endpoints must use offset-based pagination with limit capped at 50. Frontend must increment offset by limit to paginate, or use has_more to know when to stop",
+      "evidence": []
     }
   ]
 }
