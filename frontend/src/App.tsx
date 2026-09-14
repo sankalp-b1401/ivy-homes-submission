@@ -9,6 +9,7 @@ import Rentals from './pages/Rentals';
 import Projects from './pages/Projects';
 import SavedListings from './pages/SavedListings';
 import Insights from './pages/Insights';
+import Health from './pages/Health';
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/health" element={<Health />} />
           
           <Route path="/" element={
             <PrivateRoute>

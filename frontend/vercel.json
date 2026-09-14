@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/health",
+      "destination": "https://solve.ivy.homes/health"
+    },
+    {
       "source": "/(.*)",
       "destination": "/"
     }
