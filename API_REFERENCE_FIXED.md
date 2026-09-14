@@ -196,14 +196,9 @@ indicates whether the listing is currently active. `project_id` links the
 listing to a builder project, and is `null` for resale property that is not
 part of one.
 
-### `GET /v1/listing/{listing_id}`
+### `GET /v1/listings/{listing_id}`
 
 A single listing. Same object as above.
-
-### `GET /v1/listings/{listing_id}/similar`
-
-Up to ten comparable listings — same locality, same bedroom count, price within
-15%. Useful for a "you may also like" strip on the detail page.
 
 ---
 

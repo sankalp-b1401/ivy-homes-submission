@@ -195,3 +195,19 @@ The actual response from `/v1/listings` look like this:
 
 **6. Incorrect Query Paramters in listing:**
 I tested all the query parameters mentioned in the documentation as well as the fields in the listing object. Only the following query parameters work: `limit, offset, locality, bhk, property_type, sort_by, order`. `furnishing, min_price, max_price` did not work.
+
+**7. Incorrect routes in /v1/listings:**
+
+> GET /v1/listing/{listing_id}
+
+returns `{"detail":"Not Found"}`
+
+The correct endpoint is:
+
+> GET /v1/listing**s**/{listing_id}
+
+which fetches the listing based on the unique ID.
+
+> GET /v1/listings/{listing_id}/similar
+
+I tried reaching this endpoint and some alternate endpionts but this route does not exist and neither any alternate routes present for this functionality. It has to accomplished from client-side.

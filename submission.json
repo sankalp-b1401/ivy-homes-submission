@@ -76,6 +76,33 @@
       "how_found": "tested each documented query parameter individually and compared results. furnishing, min_price, and max_price returned the same unfiltered results regardless of value",
       "impact": "price range and furnishing filtering must be done client-side",
       "evidence": []
+    },
+    {
+      "endpoint": "/v1/listing/{id}",
+      "category": "missing_endpoint",
+      "documented": "GET /v1/listing/{listing_id} (singular) returns a single listing",
+      "actual": "The correct path is GET /v1/listings/{listing_id} (plural). The singular /v1/listing/{listing_id} returns {\"detail\": \"Not Found\"}",
+      "how_found": "called GET /v1/listing/{listing_id} as documented and received a 404. Tried the plural form /v1/listings/{listing_id} which worked",
+      "impact": "frontend must use /v1/listings/{listing_id} for detail pages",
+      "evidence": []
+    },
+    {
+      "endpoint": "/v1/listings/{id}/similar",
+      "category": "missing_endpoint",
+      "documented": "GET /v1/listings/{listing_id}/similar returns up to ten comparable listings",
+      "actual": "This endpoint does not exist. No alternate routes found for this functionality",
+      "how_found": "called GET /v1/listings/{listing_id}/similar and received a 404. Tried alternate paths — none exist",
+      "impact": "similar listings functionality must be implemented client-side using available listing data",
+      "evidence": []
+    },
+    {
+      "endpoint": "/v1/listings/{id}",
+      "category": "undocumented_endpoint",
+      "documented": "Only /v1/listing/{listing_id} (singular) is documented for fetching a single listing",
+      "actual": "GET /v1/listings/{listing_id} (plural) exists and returns a single listing. This is the working endpoint, but it is not in the documentation",
+      "how_found": "discovered while testing the documented singular path which returned 404 — tried the plural form and it worked",
+      "impact": "this is the correct endpoint to use for listing detail pages",
+      "evidence": []
     }
   ]
 }
