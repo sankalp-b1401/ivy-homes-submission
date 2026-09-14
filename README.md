@@ -284,3 +284,33 @@ After some exhaustive, hit-and-trial, I wrapped up with the conclusion that it's
 Above endpoints layered with: `/v1/*/summary`, `/v1/*/overview`
 
 But all combinations returned `{"detail": "Not Found"}`. So, the insights probably have to calculated on client-side only.
+
+### Discrepancies in Listing Data:
+
+**1. `/v1/listings:**
+
+**(A) Spotting Fake Entires:**
+According to the API response there are `total=4354` listings but when I fetched the listings it turns out there are **4700** listings in total. But as the `statement.md` suggested, API is not buggy and is the only source of truth. That means there are some fake listings in the dataset. I stored all the listings in `listings.json` and ran a audit script (written using AI) to flag the suspicious entries, I used the following rules to decide whether any entry is fake or not:
+
+- **Structural:** all required fields are present; numeric fields contain valid numbers; no missing or duplicate `listing_id`.
+- **Value constraints:** bedrooms, bathrooms, balconies, parking, and floor are non-negative; price and area values are positive.
+- **Property type:** `property_type` must be one of `apartment`, `villa`, `independent house`, `plot`, or `builder floor`.
+- **Furnishing:** `furnishing` must be one of `unfurnished`, `semi-furnished`, or `fully-furnished`.
+- **Plot consistency:** plots must have `floor = 0`, `total_floors = 0`, and `furnishing = "unfurnished"`.
+- **Residential floor consistency:** residential properties must have `total_floors > 0` and `floor <= total_floors`.
+- **Bedroom/bathroom consistency:** zero bedrooms or bathrooms are allowed for plots but are suspicious for residential properties.
+- **Area consistency:** `carpet_area` must not exceed `super_built_up_area`.
+- **Coordinate validity:** latitude must be within `[-90, 90]` and longitude within `[-180, 180]`.
+- **Website/listing ID consistency:** each website must use its corresponding listing ID prefix:
+  - `magichomes` → `MAG-`
+  - `dwelling` → `DWE-`
+  - `squarelane` → `SQU-`
+  - `zerobroker` → `ZER-`
+  - `100acres` → `100-`
+- **Description consistency:** BHK values mentioned in the description are compared against the structured `bedroom` value.
+- **Suspicious text:** descriptions containing known AI/instructional/non-property text are flagged.
+- **Repetition:** repeated descriptions and unusually repeated contact numbers are reported.
+
+**Note: In my opinion, `property_type: plot` shouldn't have any `furnishing` value, but amongst the given choices I assumed it would be best to only accept `furnishing: unfurnished` for plots, even though this also does not make any sense for a plot type property.**
+
+> The script flagged **164** listings that I verified are correctly flagged. That leaves us with **4536** (4700-164) listings.
