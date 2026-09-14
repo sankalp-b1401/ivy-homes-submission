@@ -148,6 +148,15 @@
       "how_found": "tested /v1/saved after discovering /v1/favourites returned 404; confirmed it handles saved listings operations",
       "impact": "frontend must use /v1/saved to implement user favourites/saved listings functionality",
       "evidence": []
+    },
+    {
+      "endpoint": "/v1/analytics/summary",
+      "category": "missing_endpoint",
+      "documented": "GET /v1/analytics/summary returns pre-computed aggregates for the city (median_price, median_price_per_sqft, by_locality, by_bhk)",
+      "actual": "Endpoint does not exist (returns 404 Not Found). Probed alternative endpoints (/v1/insights, /v1/dashboard, /v1/stats, /v1/metrics, /v1/summary, and related paths) but none exist",
+      "how_found": "called GET /v1/analytics/summary and received 404 Not Found. Tested various alternative naming conventions with no success",
+      "impact": "all analytics, aggregations, and insights must be computed client-side from the retrievable listings dataset",
+      "evidence": []
     }
   ]
 }

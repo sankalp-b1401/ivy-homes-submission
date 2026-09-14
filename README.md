@@ -260,7 +260,7 @@ This is identical to finding 4. Here's the actual rental object:
 (ii) `page` filter does not exist. `offsest` and `limit` are used together for pagination. Other parameters are correct.
 
 **11. No `/v1/favourites` endpoint exist:**
-I tried probing `/v1/favourites` but it kept on returning: `{"details": "not found"}`. So I tried: `favourite, favorite, favorites` but none of them worked. I intuitively tried `saved` because that is the closest naming convention to what this endpoint is meant to do and it worked.
+I tried probing `/v1/favourites` but it kept on returning: `{"detail": "Not Found"}`. So I tried: `favourite, favorite, favorites` but none of them worked. I intuitively tried `saved` because that is the closest naming convention to what this endpoint is meant to do and it worked.
 
 Instead `v1/saved` endpoint exists and supports GET, POST and DELETE actions.
 
@@ -271,3 +271,16 @@ POST `/v1/saved` requires:
 ```
 
 The response structure is same as described in `/v1/favourites`.
+
+**12. `/v1/analytics/summary` does not exist:**
+After some exhaustive, hit-and-trial, I wrapped up with the conclusion that it's a possiblity that this endpoint does not exist. I tried the following keywords before concluding:
+
+`/v1/insights`
+`/v1/dashboard`
+`/v1/stats`
+`/v1/metrics`
+`/v1/summary`
+
+Above endpoints layered with: `/v1/*/summary`, `/v1/*/overview`
+
+But all combinations returned `{"detail": "Not Found"}`. So, the insights probably have to calculated on client-side only.

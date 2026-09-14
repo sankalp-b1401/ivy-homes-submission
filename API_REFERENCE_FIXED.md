@@ -337,27 +337,6 @@ A logged-in user can save listings.
 
 ---
 
-## Analytics
-
-### `GET /v1/analytics/summary`
-
-Pre-computed aggregates for your city — handy for a dashboard screen.
-
-```json
-{
-  "city": "bangalore",
-  "total_listings": 1240,
-  "median_price": 11200000,
-  "median_price_per_sqft": 8100,
-  "by_locality": [
-    { "locality": "whitefield", "count": 184, "median_price": 9800000 }
-  ],
-  "by_bhk": [{ "bedroom": 3, "count": 502 }]
-}
-```
-
----
-
 ## Errors
 
 | Status | Meaning                               |
