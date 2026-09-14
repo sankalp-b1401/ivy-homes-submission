@@ -218,3 +218,38 @@ The documentation mentions the filters but does not describe them properly. They
 (i) This endpoint supports: `limit, offset, locality, bhk, furnishing, sort_by, order`. There is no `pages` filter.
 
 (ii) `sort_by` can filter based on `price, deposit, posted_at, bedroom, carpet_area`
+
+**9. Rentals Listing Object misses the `is_live` field in the description**
+This is identical to finding 4. Here's the actual rental object:
+
+```json
+{
+  "listing_id": "R1000001",
+  "listing_url": "https://www.dwelling.com/rent/1000001",
+  "website": "dwelling",
+  "city_id": 1,
+  "title": "3 BHK for rent in Bellandur",
+  "apartment_name": "Sobha Meadows",
+  "locality": "whitefield",
+  "property_type": "apartment",
+  "bedroom": 3,
+  "bathroom": 3,
+  "floor": 3,
+  "total_floors": 12,
+  "furnishing": "unfurnished",
+  "facing_direction": "north-east",
+  "price": 62400,
+  "deposit": 624000,
+  "maintenance": 2500,
+  "carpet_area": 1090,
+  "super_builtup_area": 1401,
+  "latitude": 12.87119,
+  "longitude": 77.47282,
+  "posted_by": "owner",
+  "posted_by_name": "Shreya Bhat",
+  "posted_by_contact": "+912002924979",
+  "description": "3 BHK, unfurnished, in Sobha Meadows, Whitefield. Gated society with security.",
+  "posted_at": "2026-07-09T05:00:00Z",
+  "is_live": true
+}
+```

@@ -112,6 +112,15 @@
       "how_found": "tested all filter parameters on /v1/rentals. Confirmed page does not exist (uses offset like listings). Tested sort_by with various field names to determine which are accepted",
       "impact": "frontend must use offset-based pagination for rentals and can sort by deposit and carpet_area in addition to the obvious fields",
       "evidence": []
+    },
+    {
+      "endpoint": "/v1/rentals",
+      "category": "completeness",
+      "documented": "Rental listing object does not include an is_live field",
+      "actual": "Rental listings include an is_live boolean field, same as sale listings. The endpoint returns both active and inactive rentals",
+      "how_found": "fetched rentals and observed the is_live field in every rental object, identical to the listing endpoint behavior (finding 4)",
+      "impact": "frontend must filter rentals by is_live: true before displaying to users",
+      "evidence": []
     }
   ]
 }

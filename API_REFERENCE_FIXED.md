@@ -221,37 +221,38 @@ Rental listings in your city.
 
 ```json
 {
-  "listing_id": "R1000042",
-  "listing_url": "https://www.zerobroker.com/rent/1000042",
-  "website": "zerobroker",
+  "listing_id": "R1000001",
+  "listing_url": "https://www.dwelling.com/rent/1000001",
+  "website": "dwelling",
   "city_id": 1,
-  "title": "2 BHK for rent in Koramangala",
+  "title": "3 BHK for rent in Bellandur",
   "apartment_name": "Sobha Meadows",
-  "locality": "koramangala",
+  "locality": "whitefield",
   "property_type": "apartment",
-  "bedroom": 2,
-  "bathroom": 2,
-  "floor": 4,
+  "bedroom": 3,
+  "bathroom": 3,
+  "floor": 3,
   "total_floors": 12,
-  "furnishing": "fully-furnished",
-  "facing_direction": "east",
-  "price": 42000,
-  "deposit": 250000,
+  "furnishing": "unfurnished",
+  "facing_direction": "north-east",
+  "price": 62400,
+  "deposit": 624000,
   "maintenance": 2500,
-  "carpet_area": 980,
-  "super_builtup_area": 1280,
-  "latitude": 12.93461,
-  "longitude": 77.62281,
+  "carpet_area": 1090,
+  "super_builtup_area": 1401,
+  "latitude": 12.87119,
+  "longitude": 77.47282,
   "posted_by": "owner",
-  "posted_by_name": "Priya Nair",
-  "posted_by_contact": "+912009876543",
-  "description": "2 BHK, fully-furnished, in Sobha Meadows, Koramangala. Close to the metro.",
-  "posted_at": "2026-07-02T11:45:00Z"
+  "posted_by_name": "Shreya Bhat",
+  "posted_by_contact": "+912002924979",
+  "description": "3 BHK, unfurnished, in Sobha Meadows, Whitefield. Gated society with security.",
+  "posted_at": "2026-07-09T05:00:00Z",
+  "is_live": true
 }
 ```
 
 `price` is the monthly rent in rupees and `deposit` is the security deposit in
-rupees.
+rupees. `is_live` indicates whether the rental is currently active.
 
 ### `GET /v1/rentals/{listing_id}`
 
