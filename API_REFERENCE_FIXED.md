@@ -144,16 +144,13 @@ one physical property.
 | `locality`        | string | Exact match, lowercase                                             |
 | `bhk`             | int    | Number of bedrooms                                                 |
 | `property_type`   | string | `apartment`, `villa`, `independent house`, `plot`, `builder floor` |
-| `min_price`       | int    | Rupees, inclusive                                                  |
-| `max_price`       | int    | Rupees, inclusive                                                  |
-| `furnishing`      | string | `unfurnished`, `semi-furnished`, `fully-furnished`                 |
 | `sort_by`         | string | `price`, `carpet_area`, `posted_at`, `bedroom`                     |
 | `order`           | string | `asc` (default) or `desc`                                          |
 
 **Example**
 
 ```
-GET /v1/listings?locality=koramangala&bhk=3&min_price=15000000&order=desc&sort_by=price
+GET /v1/listings?locality=koramangala&bhk=3&order=desc&sort_by=price
 ```
 
 **Listing object**

@@ -192,3 +192,6 @@ The actual response from `/v1/listings` look like this:
 (i) The `limit` field's default value is 20 and I tested setting it to 200 but it saturated at 50. So the maximum value is 50.
 (ii) There is no `page` field. The pagination behaviour can be achieved via `offset`. An `offset=X` fetches the listing starting from index X (the listing object list is 0-indexed that is why offset = 0 is the default value). So to fetch all the data (which I did using a bash script), set `?limit=50` and increment `offset` by multiples of 50 after each request.
 (iii) The `count` field tells us the number of entries fetched in the request.
+
+**6. Incorrect Query Paramters in listing:**
+I tested all the query parameters mentioned in the documentation as well as the fields in the listing object. Only the following query parameters work: `limit, offset, locality, bhk, property_type, sort_by, order`. `furnishing, min_price, max_price` did not work.

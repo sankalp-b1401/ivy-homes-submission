@@ -67,6 +67,15 @@
       "how_found": "fetched /v1/listings and observed the response shape uses offset/count/has_more instead of page/page_size. Tested limit=200 which saturated at 50",
       "impact": "all collection endpoints must use offset-based pagination with limit capped at 50. Frontend must increment offset by limit to paginate, or use has_more to know when to stop",
       "evidence": []
+    },
+    {
+      "endpoint": "/v1/listings",
+      "category": "filters",
+      "documented": "Query parameters furnishing, min_price, and max_price are supported as filters on /v1/listings",
+      "actual": "These three parameters are accepted but silently ignored — they do not filter results. Only offset, limit, locality, bhk, property_type, sort_by, and order actually work",
+      "how_found": "tested each documented query parameter individually and compared results. furnishing, min_price, and max_price returned the same unfiltered results regardless of value",
+      "impact": "price range and furnishing filtering must be done client-side",
+      "evidence": []
     }
   ]
 }
