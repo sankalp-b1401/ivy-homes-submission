@@ -289,7 +289,7 @@ But all combinations returned `{"detail": "Not Found"}`. So, the insights probab
 
 **1. `/v1/listings:**
 
-**(A) Spotting Fake Entires:**
+**(A) Spotting Corrupt Entires:**
 According to the API response there are `total=4354` listings but when I fetched the listings it turns out there are **4700** listings in total. But as the `statement.md` suggested, API is not buggy and is the only source of truth. That means there are some fake listings in the dataset. I stored all the listings in `listings.json` and ran a audit script (written using AI) to flag the suspicious entries, I used the following rules to decide whether any entry is fake or not:
 
 - **Structural:** all required fields are present; numeric fields contain valid numbers; no missing or duplicate `listing_id`.
@@ -314,3 +314,63 @@ According to the API response there are `total=4354` listings but when I fetched
 **Note: In my opinion, `property_type: plot` shouldn't have any `furnishing` value, but amongst the given choices I assumed it would be best to only accept `furnishing: unfurnished` for plots, even though this also does not make any sense for a plot type property.**
 
 > The script flagged **164** listings that I verified are correctly flagged. That leaves us with **4536** (4700-164) listings.
+
+**(B) Identifyin Duplicate Listings:**
+
+To find duplicates I used: apartment name, coordinates, carpet area, bedroom as the key and used DSU for grouping. This was my framework to detect duplicates:
+
+1. Normalize `apartment_name` and group by: `apartment_name + locality + bedroom + floor`.
+
+2. Within each group, compare every pair.
+
+3. Mark as **Type 1 duplicate** only when:
+   - coordinates are within **100 m**, and
+   - `carpet_area` differs by at most **3%**.
+
+4. Group all matched listings together and output their complete objects.
+
+I found out that there were **413** groups with **846** listings.
+
+**(C) Detecting Fake Listings:**
+
+I used LLM to analyse the data and find outliers (similar to anomaly detection):
+
+To identify the fake listings we need to do data analysis on the same type of data and find outliers. This was my prompt:
+
+```
+We should categorize the data like this:
+
+1. locality
+2. bedroom count
+3. carpet area
+4. super\_built\_up\_area
+5. property\_type
+6. furnishing
+7. price
+
+f(locality, bedroom, carpet_are, super_built_up_area, property_typ, furnishing) = price
+
+1 -> 5 can be used to collect the data related to similar type of properties and price can be the output column. We analyze the prices and find a range of price based on the statistical calculations of the data. That way we can run each entry and compare it with out range, if it is outside that expected range (with a considerable error difference) it implies it is a fake entry. Skip the corrupt entries.
+
+For example: Villas with 4 bedroom, in whitefield area, 500sqft carpet area, 700 sqft super\_built\_up area ranges from 20Cr - 50Cr but there's a villa that costs only 50000 is definitely a fake entry. If you understand the idea than create a theoretical framework to identify fake listings.
+```
+
+Here's the framework LLM and I agreed upon:
+
+```
+### Fake Listing Detection Framework
+
+1. **Exclude corrupt listings** before analysis.
+2. **Group comparable listings** by:
+   `locality + bedroom + property_type + furnishing + carpet_area + super_built_up_area`
+   using reasonable area tolerances.
+3. **Require enough peers** (e.g. ≥10) to form a reliable price distribution.
+4. **Estimate expected price** using robust statistics on `log(price)` — median and MAD.
+5. **Use leave-one-out statistics** so the listing being tested does not affect its own benchmark.
+6. **Calculate anomaly measures** such as modified z-score and `price / group-median-price`.
+7. **Flag only extreme price outliers** as fake candidates, not merely moderate deviations.
+8. **Record the evidence** for every flagged listing: peer count, expected price, actual price, ratio, and anomaly score.
+
+```
+
+I found out that **59** listings were fake.
