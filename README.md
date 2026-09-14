@@ -19,6 +19,53 @@ npm run dev
 Open `http://localhost:3000` in your browser.
 
 ---
+## Project Structure
+
+```text
+ivy-homes-submission/
+├── API_REFERENCE_FIXED.md           # Corrected ground-truth API documentation
+├── INTEGRATION_PLAN.md              # Technical architecture & integration plan
+├── README.md                        # Documentation, running guide & audit logs
+├── submission.json                  # Final audit report with answers and evidence
+├── data/                            # Raw API snapshots and audit datasets
+│   ├── listings.json
+│   ├── rentals.json
+│   ├── projects.json
+│   └── listing_audit.json
+├── scripts/                         # Python & PowerShell data audit scripts
+│   ├── detect-corrupt-listings.py   # Detects physically impossible property data
+│   ├── detect-fake-listings.py      # Statistical outlier detector (MAD / z-score)
+│   ├── detect-duplicate-listings.py # Identifies repeated listing records
+│   ├── analyse-listings.py          # Aggregates BHK & locality metrics
+│   └── fetch-*.ps1                  # Paginated API scrapers
+├── frontend/                        # React + TypeScript web application
+│   ├── vercel.json                  # Deployment rewrites & /health proxy
+│   ├── vite.config.ts               # Local dev server & /health proxy
+│   └── src/
+│       ├── App.tsx                  # Root application router
+│       ├── config/api.ts            # Secure API key config (zero leaks)
+│       ├── context/AuthContext.tsx  # Auth state & token session lifecycle
+│       ├── data/invalidListingIds.ts# Curated filter list of corrupt/fake listings
+│       ├── pages/
+│       │   ├── Home.tsx             # Main property search & filters (₹5K–₹2Cr)
+│       │   ├── Rentals.tsx          # Rental listings with apartment names
+│       │   ├── Projects.tsx         # Projects with normalized price orders (Lacs/Cr)
+│       │   ├── Insights.tsx         # Real-time market analytics dashboard
+│       │   ├── ListingDetail.tsx    # Property details & specifications
+│       │   ├── Health.tsx           # System health & server clock (/health)
+│       │   ├── SavedListings.tsx
+│       │   └── Login.tsx
+│       └── utils/
+│           ├── analytics.ts         # Statistical calculation engine (BHKs, medians)
+│           ├── listingFilters.ts    # Search, filter, and anomaly exclusion rules
+│           └── propertyImages.ts    # Contextual high-res fallback property images
+└── task-files/                      # Original task assignment files
+    ├── statement.md                 # Assignment brief and task requirements
+    ├── API_REFERENCE.md             # Original API documentation with discrepancies
+    └── submission.template.json     # Submission structure template
+```
+
+---
 
 ## API Documentation Alignment Logs
 
