@@ -264,9 +264,17 @@ A single rental.
 
 ### `GET /v1/projects`
 
-Builder projects in your city. Supports `page`, `limit`, `locality`,
-`project_status`, `sort_by` (`price_min`, `price_max`, `launch_date`,
-`total_units`), `order`.
+Builder projects in your city.
+
+**Query parameters**
+
+| Parameter         | Type   | Notes                                                  |
+| ----------------- | ------ | ------------------------------------------------------ |
+| `offset`, `limit` | int    | See Pagination                                         |
+| `locality`        | string | Exact match, lowercase                                 |
+| `project_status`  | string | Project status filter                                  |
+| `sort_by`         | string | `price_min`, `price_max`, `launch_date`, `total_units` |
+| `order`           | string | `asc` (default) or `desc`                              |
 
 ```json
 {

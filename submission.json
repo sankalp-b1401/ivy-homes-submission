@@ -123,12 +123,12 @@
       "evidence": []
     },
     {
-      "endpoint": "/v1/listings",
+      "endpoint": "/v1/projects",
       "category": "filters",
-      "documented": "GET /v1/listings?project_id=... filters listings by project, and total_listings on each project always agrees with this filtered count",
-      "actual": "project_id is not a supported filter on /v1/listings — the parameter is silently ignored and returns unfiltered results. The total_listings claim cannot be verified via this route",
-      "how_found": "called GET /v1/listings?project_id={id} and observed it returned the same unfiltered results regardless of the project_id value",
-      "impact": "to count listings per project, must filter client-side by matching project_id field in listing objects",
+      "documented": "GET /v1/projects documents pagination via 'page' and 'limit'. It also claims 'total_listings' always agrees with what 'GET /v1/listings?project_id=...' returns.",
+      "actual": "The 'page' parameter does not exist; pagination uses 'offset' and 'limit'. Additionally, 'project_id' filter on 'GET /v1/listings' fails silently and returns unfiltered results, making it impossible to verify 'total_listings' via that endpoint.",
+      "how_found": "tested pagination with page vs offset/limit on /v1/projects, and verified that GET /v1/listings?project_id={id} silently ignores the parameter and returns unfiltered listings",
+      "impact": "projects must be paginated using offset/limit. Listing counts per project cannot be fetched via project_id filter and must be aggregated client-side",
       "evidence": []
     }
   ]
