@@ -17,7 +17,9 @@ Read the documentation at every step -> Test the claim ? If VALID move on : If I
 Sending the key as a query parameter (`?api_key=...`) does **not** work. The API returns an error:
 
 ```json
-{"detail": "send your key in the X-API-Key request header, not as a query parameter"}
+{
+  "detail": "send your key in the X-API-Key request header, not as a query parameter"
+}
 ```
 
 I tested the suggestion from the above error:

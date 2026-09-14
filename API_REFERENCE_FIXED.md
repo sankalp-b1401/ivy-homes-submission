@@ -302,9 +302,10 @@ Builder projects in your city.
 }
 ```
 
-`price_min` and `price_max` are in rupees.
+`price_min` and `price_max` are in rupees but not normalized. The are compressed and have to be
+normalized based on the prices of listings belonging to these projects.
 
-`total_listings` is the number of listings reported for the project.
+`total_listings` is the number of listings reported for the project. It may be incorrect so do not rely on it.
 
 ### `GET /v1/projects/{project_id}`
 
@@ -336,6 +337,10 @@ A logged-in user can save listings.
 ### `DELETE /v1/saved/{listing_id}`
 
 ---
+
+## Analytics
+
+`/v1/analytics/summary` does not exist so analytics have to calculated on the client-side.
 
 ## Errors
 
