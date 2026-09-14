@@ -101,6 +101,7 @@ export interface LocalityMetric {
 export interface BhkMetric {
   bedroom: number;
   count: number;
+  median_price?: number;
 }
 
 export interface AnalyticsSummary {
@@ -108,6 +109,7 @@ export interface AnalyticsSummary {
   total_listings: number;
   median_price: number;
   median_price_per_sqft: number;
+  avg_price_per_sqft_2bhk?: number;
   by_locality: LocalityMetric[];
   by_bhk: BhkMetric[];
 }

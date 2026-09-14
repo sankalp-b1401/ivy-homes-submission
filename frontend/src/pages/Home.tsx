@@ -46,6 +46,9 @@ export default function Home() {
     locality: searchParams.get('locality') || '',
     bhk: searchParams.get('bhk') || '',
     property_type: searchParams.get('property_type') || '',
+    furnishing: searchParams.get('furnishing') || '',
+    min_price: searchParams.get('min_price') || '',
+    max_price: searchParams.get('max_price') || '',
     project_id: searchParams.get('project_id') || '',
     apartment_name: searchParams.get('apartment_name') || '',
     sort_by: searchParams.get('sort_by') || 'posted_at',
@@ -59,50 +62,94 @@ export default function Home() {
       if (!isLoadMore) setLoading(true);
       setError(null);
       
-      const params: Record<string, any> = {
-        limit: 20,
-        offset: currentOffset,
-      };
-      if (filters.locality) params.locality = filters.locality.toLowerCase().trim();
-      if (filters.bhk) params.bhk = parseInt(filters.bhk);
-      if (filters.property_type) params.property_type = filters.property_type.toLowerCase();
-      if (filters.project_id) params.project_id = filters.project_id;
-      if (filters.apartment_name) params.apartment_name = filters.apartment_name;
-      if (filters.sort_by) params.sort_by = filters.sort_by;
-      if (filters.order) params.order = filters.order;
+      const hasClientFilters = Boolean(
+        filters.furnishing ||
+        filters.min_price ||
+        filters.max_price ||
+        filters.apartment_name ||
+        filters.project_id
+      );
 
-      const [data, savedData] = await Promise.all([
-        listingsApi.getListings(params),
-        currentOffset === 0 ? savedApi.getSaved().catch(() => ({ results: [] })) : Promise.resolve(null)
-      ]);
+      const limit = 50;
+      let pageOffset = currentOffset;
+      let accumulatedValid: Listing[] = [];
+      let serverHasMore = true;
+      let serverTotal = 0;
 
-      if (savedData) {
-        setSavedIds(new Set(savedData.results.map((l: Listing) => l.listing_id)));
-      }
+      // When client filters are active, fetch until we have enough items or end of results
+      let fetchRounds = 0;
+      const maxRounds = hasClientFilters ? 4 : 1;
 
-      let validListings = data.results.filter(isValidListing);
+      while (fetchRounds < maxRounds && serverHasMore && accumulatedValid.length < 20) {
+        fetchRounds++;
+        const params: Record<string, any> = {
+          limit,
+          offset: pageOffset,
+        };
+        if (filters.locality) params.locality = filters.locality.toLowerCase().trim();
+        if (filters.bhk) params.bhk = parseInt(filters.bhk);
+        if (filters.property_type) params.property_type = filters.property_type.toLowerCase();
+        if (filters.sort_by) params.sort_by = filters.sort_by;
+        if (filters.order) params.order = filters.order;
 
-      // Support project / development filtering
-      if (filters.apartment_name || filters.project_id) {
-        const aptFilter = (filters.apartment_name || '').toLowerCase().trim();
-        const filtered = validListings.filter(l => {
-          if (filters.project_id && l.project_id === filters.project_id) return true;
-          if (aptFilter && l.apartment_name && l.apartment_name.toLowerCase().includes(aptFilter)) return true;
-          return false;
-        });
-        if (filtered.length > 0) {
-          validListings = filtered;
+        const [data, savedData] = await Promise.all([
+          listingsApi.getListings(params),
+          currentOffset === 0 && fetchRounds === 1 ? savedApi.getSaved().catch(() => ({ results: [] })) : Promise.resolve(null)
+        ]);
+
+        if (savedData) {
+          setSavedIds(new Set(savedData.results.map((l: Listing) => l.listing_id)));
         }
+
+        serverHasMore = data.has_more;
+        serverTotal = data.total;
+        pageOffset += limit;
+
+        // 1. Centralized validity filtering (is_live === true, not corrupt, not fake)
+        let batch = data.results.filter(isValidListing);
+
+        // 2. Client-side furnishing filtering (server silently ignores furnishing param)
+        if (filters.furnishing) {
+          const f = filters.furnishing.toLowerCase().trim();
+          batch = batch.filter(l => l.furnishing && l.furnishing.toLowerCase() === f);
+        }
+
+        // 3. Client-side price range filtering (server silently ignores min_price & max_price)
+        if (filters.min_price) {
+          const min = Number(filters.min_price);
+          if (!isNaN(min) && min > 0) {
+            batch = batch.filter(l => l.price >= min);
+          }
+        }
+        if (filters.max_price) {
+          const max = Number(filters.max_price);
+          if (!isNaN(max) && max > 0) {
+            batch = batch.filter(l => l.price <= max);
+          }
+        }
+
+        // 4. Project / development filtering
+        if (filters.apartment_name || filters.project_id) {
+          const aptFilter = (filters.apartment_name || '').toLowerCase().trim();
+          batch = batch.filter(l => {
+            if (filters.project_id && l.project_id === filters.project_id) return true;
+            if (aptFilter && l.apartment_name && l.apartment_name.toLowerCase().includes(aptFilter)) return true;
+            return false;
+          });
+        }
+
+        accumulatedValid.push(...batch);
       }
 
       if (isLoadMore) {
-        setListings(prev => [...prev, ...validListings]);
+        setListings(prev => [...prev, ...accumulatedValid]);
       } else {
-        setListings(validListings);
+        setListings(accumulatedValid);
       }
       
-      setHasMore(data.has_more);
-      setTotal(data.total);
+      setOffset(pageOffset);
+      setHasMore(serverHasMore);
+      setTotal(serverTotal);
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Failed to load listings');
     } finally {
@@ -117,6 +164,9 @@ export default function Home() {
       locality: params.get('locality') || '',
       bhk: params.get('bhk') || '',
       property_type: params.get('property_type') || '',
+      furnishing: params.get('furnishing') || '',
+      min_price: params.get('min_price') || '',
+      max_price: params.get('max_price') || '',
       project_id: params.get('project_id') || '',
       apartment_name: params.get('apartment_name') || '',
       sort_by: params.get('sort_by') || 'posted_at',
@@ -127,6 +177,9 @@ export default function Home() {
         prev.locality === updated.locality &&
         prev.bhk === updated.bhk &&
         prev.property_type === updated.property_type &&
+        prev.furnishing === updated.furnishing &&
+        prev.min_price === updated.min_price &&
+        prev.max_price === updated.max_price &&
         prev.project_id === updated.project_id &&
         prev.apartment_name === updated.apartment_name &&
         prev.sort_by === updated.sort_by &&
@@ -152,11 +205,25 @@ export default function Home() {
     navigate({ search: params.toString() }, { replace: true });
   };
 
+  const handleMultipleFilterChanges = (updates: Record<string, string>) => {
+    const newFilters = { ...filters, ...updates };
+    setFilters(newFilters);
+
+    const params = new URLSearchParams();
+    Object.entries(newFilters).forEach(([k, v]) => {
+      if (v) params.set(k, String(v));
+    });
+    navigate({ search: params.toString() }, { replace: true });
+  };
+
   const clearAllFilters = () => {
     const reset = {
       locality: '',
       bhk: '',
       property_type: '',
+      furnishing: '',
+      min_price: '',
+      max_price: '',
       project_id: '',
       apartment_name: '',
       sort_by: 'posted_at',
@@ -169,9 +236,7 @@ export default function Home() {
   const loadMore = () => {
     if (!loadingMore && hasMore) {
       setLoadingMore(true);
-      const nextOffset = offset + 20;
-      setOffset(nextOffset);
-      fetchListings(nextOffset, true);
+      fetchListings(offset, true);
     }
   };
 
@@ -179,8 +244,43 @@ export default function Home() {
     Boolean(filters.locality),
     Boolean(filters.bhk),
     Boolean(filters.property_type),
+    Boolean(filters.furnishing),
+    Boolean(filters.min_price || filters.max_price),
     Boolean(filters.apartment_name || filters.project_id),
   ].filter(Boolean).length;
+
+  const formatBudgetDisplay = (val: string) => {
+    const num = Number(val);
+    if (isNaN(num) || num <= 0) return '';
+    if (num >= 10000000) {
+      const cr = num / 10000000;
+      return `₹${cr % 1 === 0 ? cr : cr.toFixed(2)} Cr`;
+    }
+    if (num >= 100000) {
+      const l = num / 100000;
+      return `₹${l % 1 === 0 ? l : l.toFixed(2)} L`;
+    }
+    return `₹${num.toLocaleString('en-IN')}`;
+  };
+
+  const formatBudgetChip = (min: string, max: string) => {
+    if (min && max) return `${formatBudgetDisplay(min)} – ${formatBudgetDisplay(max)}`;
+    if (min) return `Above ${formatBudgetDisplay(min)}`;
+    if (max) return `Under ${formatBudgetDisplay(max)}`;
+    return 'Any';
+  };
+
+  const currentBudgetLabel = () => {
+    if (filters.min_price === '5000' && filters.max_price === '2500000') return '5k-25l';
+    if (filters.min_price === '2500000' && filters.max_price === '5000000') return '25l-50l';
+    if (filters.min_price === '5000000' && filters.max_price === '10000000') return '50l-1cr';
+    if (filters.min_price === '10000000' && filters.max_price === '15000000') return '1cr-1.5cr';
+    if (filters.min_price === '15000000' && filters.max_price === '20000000') return '1.5cr-2cr';
+    if (filters.min_price === '20000000' && filters.max_price === '') return 'above-2cr';
+    if (filters.min_price === '' && filters.max_price === '10000000') return '50l-1cr';
+    if (filters.min_price === '10000000' && filters.max_price === '20000000') return '1cr-1.5cr';
+    return '';
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
@@ -196,9 +296,9 @@ export default function Home() {
 
       {/* Floating Modern Search & Filter Console */}
       <div className="bg-white rounded-3xl p-5 sm:p-6 shadow-xl shadow-stone-200/50 border border-stone-200/80 mb-8 space-y-4">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3.5 items-center">
           {/* Locality Search Input */}
-          <div className="lg:col-span-5 relative">
+          <div className="sm:col-span-2 lg:col-span-4 relative">
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
               <Search className="h-5 w-5 text-stone-400" />
             </div>
@@ -220,10 +320,10 @@ export default function Home() {
           </div>
 
           {/* Property Type Dropdown */}
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-2">
             <div className="relative">
               <select
-                className="w-full appearance-none pl-4 pr-10 py-3 rounded-2xl bg-stone-50 border border-stone-200 text-stone-800 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#0D3B2E] focus:bg-white transition-all cursor-pointer"
+                className="w-full appearance-none pl-3.5 pr-8 py-3 rounded-2xl bg-stone-50 border border-stone-200 text-stone-800 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[#0D3B2E] focus:bg-white transition-all cursor-pointer"
                 value={filters.property_type}
                 onChange={(e) => handleFilterChange('property_type', e.target.value)}
               >
@@ -231,29 +331,84 @@ export default function Home() {
                 <option value="apartment">Gated Apartment</option>
                 <option value="villa">Private Villa</option>
                 <option value="independent house">Independent House</option>
+                <option value="plot">Residential Plot</option>
                 <option value="builder floor">Builder Floor</option>
               </select>
-              <ChevronDown className="w-4 h-4 text-stone-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <ChevronDown className="w-4 h-4 text-stone-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
+          </div>
+
+          {/* Furnishing Dropdown */}
+          <div className="lg:col-span-2">
+            <div className="relative">
+              <select
+                className="w-full appearance-none pl-3.5 pr-8 py-3 rounded-2xl bg-stone-50 border border-stone-200 text-stone-800 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[#0D3B2E] focus:bg-white transition-all cursor-pointer"
+                value={filters.furnishing}
+                onChange={(e) => handleFilterChange('furnishing', e.target.value)}
+              >
+                <option value="">All Furnishing</option>
+                <option value="fully-furnished">Fully Furnished</option>
+                <option value="semi-furnished">Semi-Furnished</option>
+                <option value="unfurnished">Unfurnished</option>
+              </select>
+              <ChevronDown className="w-4 h-4 text-stone-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
+          </div>
+
+          {/* Price Range Dropdown */}
+          <div className="lg:col-span-2">
+            <div className="relative">
+              <select
+                className="w-full appearance-none pl-3.5 pr-8 py-3 rounded-2xl bg-stone-50 border border-stone-200 text-stone-800 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[#0D3B2E] focus:bg-white transition-all cursor-pointer"
+                value={currentBudgetLabel()}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === '5k-25l') {
+                    handleMultipleFilterChanges({ min_price: '5000', max_price: '2500000' });
+                  } else if (val === '25l-50l') {
+                    handleMultipleFilterChanges({ min_price: '2500000', max_price: '5000000' });
+                  } else if (val === '50l-1cr') {
+                    handleMultipleFilterChanges({ min_price: '5000000', max_price: '10000000' });
+                  } else if (val === '1cr-1.5cr') {
+                    handleMultipleFilterChanges({ min_price: '10000000', max_price: '15000000' });
+                  } else if (val === '1.5cr-2cr') {
+                    handleMultipleFilterChanges({ min_price: '15000000', max_price: '20000000' });
+                  } else if (val === 'above-2cr') {
+                    handleMultipleFilterChanges({ min_price: '20000000', max_price: '' });
+                  } else {
+                    handleMultipleFilterChanges({ min_price: '', max_price: '' });
+                  }
+                }}
+              >
+                <option value="">All Budgets (₹5,000 – ₹2+ Cr)</option>
+                <option value="5k-25l">₹5,000 – ₹25 Lakh</option>
+                <option value="25l-50l">₹25 Lakh – ₹50 Lakh</option>
+                <option value="50l-1cr">₹50 Lakh – ₹1 Crore</option>
+                <option value="1cr-1.5cr">₹1 Crore – ₹1.5 Crore</option>
+                <option value="1.5cr-2cr">₹1.5 Crore – ₹2 Crore</option>
+                <option value="above-2cr">Above ₹2 Crore</option>
+              </select>
+              <ChevronDown className="w-4 h-4 text-stone-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
           </div>
 
           {/* Sort By Dropdown */}
-          <div className="lg:col-span-4">
+          <div className="lg:col-span-2">
             <div className="relative">
               <select
-                className="w-full appearance-none pl-4 pr-10 py-3 rounded-2xl bg-stone-50 border border-stone-200 text-stone-800 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#0D3B2E] focus:bg-white transition-all cursor-pointer"
+                className="w-full appearance-none pl-3.5 pr-8 py-3 rounded-2xl bg-stone-50 border border-stone-200 text-stone-800 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[#0D3B2E] focus:bg-white transition-all cursor-pointer"
                 value={`${filters.sort_by}-${filters.order}`}
                 onChange={(e) => {
                   const [sort_by, order] = e.target.value.split('-');
                   setFilters({ ...filters, sort_by, order });
                 }}
               >
-                <option value="posted_at-desc">Sort: Newest Listed</option>
-                <option value="price-asc">Sort: Price (Low to High)</option>
-                <option value="price-desc">Sort: Price (High to Low)</option>
-                <option value="carpet_area-desc">Sort: Largest Carpet Area</option>
+                <option value="posted_at-desc">Newest Listed</option>
+                <option value="price-asc">Price (Low to High)</option>
+                <option value="price-desc">Price (High to Low)</option>
+                <option value="carpet_area-desc">Largest Area</option>
               </select>
-              <ChevronDown className="w-4 h-4 text-stone-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <ChevronDown className="w-4 h-4 text-stone-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
           </div>
         </div>
@@ -326,6 +481,22 @@ export default function Home() {
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-medium border border-emerald-200 capitalize">
                   {filters.property_type}
                   <button onClick={() => handleFilterChange('property_type', '')}>
+                    <X className="w-3 h-3 hover:text-emerald-950" />
+                  </button>
+                </span>
+              )}
+              {filters.furnishing && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-medium border border-emerald-200 capitalize">
+                  {filters.furnishing}
+                  <button onClick={() => handleFilterChange('furnishing', '')}>
+                    <X className="w-3 h-3 hover:text-emerald-950" />
+                  </button>
+                </span>
+              )}
+              {(filters.min_price || filters.max_price) && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-medium border border-emerald-200">
+                  Budget: {formatBudgetChip(filters.min_price, filters.max_price)}
+                  <button onClick={() => handleMultipleFilterChanges({ min_price: '', max_price: '' })}>
                     <X className="w-3 h-3 hover:text-emerald-950" />
                   </button>
                 </span>

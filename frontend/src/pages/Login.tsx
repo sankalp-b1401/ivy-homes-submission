@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { KeyRound, Mail, Lock, AlertCircle, Sparkles, ShieldCheck, ArrowRight } from 'lucide-react';
+import { Mail, Lock, AlertCircle, ShieldCheck, ArrowRight } from 'lucide-react';
 
 export default function Login() {
   const [email, setEmail] = useState('demo1@ivy.homes');
   const [password, setPassword] = useState('');
-  const [apiKey, setApiKey] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
@@ -18,7 +17,7 @@ export default function Login() {
     setLoading(true);
     
     try {
-      await login(email, password, apiKey);
+      await login(email, password);
       navigate('/');
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Failed to login. Please check your credentials.');
@@ -53,28 +52,6 @@ export default function Login() {
                 <span>{error}</span>
               </div>
             )}
-            
-            {/* API Key */}
-            <div>
-              <label htmlFor="apiKey" className="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1.5">
-                Portal Access Key
-              </label>
-              <div className="relative rounded-xl">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                  <KeyRound className="h-4 w-4 text-stone-400" />
-                </div>
-                <input
-                  id="apiKey"
-                  name="apiKey"
-                  type="text"
-                  required
-                  placeholder="IVY26-XXXXXXXXXXXX"
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                  className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-stone-200 bg-stone-50/50 text-xs text-stone-900 placeholder-stone-400 focus:bg-white focus:ring-2 focus:ring-[#0D3B2E] focus:outline-none transition-all"
-                />
-              </div>
-            </div>
 
             {/* Email */}
             <div>

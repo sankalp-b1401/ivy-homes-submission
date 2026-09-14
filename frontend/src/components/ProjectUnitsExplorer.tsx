@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Project, Listing } from '../types';
 import { listingsApi, savedApi } from '../api';
-import { isValidListing } from '../utils';
+import { isValidListing, formatPriceRange } from '../utils';
 import { getPropertyImages } from '../utils/propertyImages';
 import { ListingCard } from './ListingCard';
 import { PropertyCardSkeleton } from './PropertySkeleton';
@@ -143,15 +143,6 @@ export const ProjectUnitsExplorer: React.FC<ProjectUnitsExplorerProps> = ({ proj
 
   const images = getPropertyImages(project.project_id, 'apartment');
 
-  const formatPriceRange = (min: number, max: number) => {
-    const format = (price: number) => {
-      if (!price) return 'On Request';
-      if (price >= 10000000) return `₹${(price / 10000000).toFixed(2)} Cr`;
-      if (price >= 100000) return `₹${(price / 100000).toFixed(2)} L`;
-      return `₹${price.toLocaleString('en-IN')}`;
-    };
-    return `${format(min)} - ${format(max)}`;
-  };
 
   // Filter & sort units
   const displayedUnits = units.filter(u => {

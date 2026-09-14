@@ -226,6 +226,7 @@ export function Footer() {
             <ul className="space-y-2.5 text-xs text-stone-400">
               <li><Link to="/?property_type=apartment" className="hover:text-white transition-colors">Gated Apartments</Link></li>
               <li><Link to="/?property_type=villa" className="hover:text-white transition-colors">Private Villas</Link></li>
+              <li><Link to="/?property_type=plot" className="hover:text-white transition-colors">Residential Plots</Link></li>
               <li><Link to="/rentals" className="hover:text-white transition-colors">Executive Rentals</Link></li>
               <li><Link to="/projects" className="hover:text-white transition-colors">Pre-Launch & New Projects</Link></li>
               <li><Link to="/insights" className="hover:text-white transition-colors">Market Analytics Report</Link></li>

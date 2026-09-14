@@ -1,6 +1,9 @@
 import { apiClient } from './client';
 import { Listing, Rental, Project, PaginatedResponse } from '../types';
 
+export * from './client';
+export * from './auth';
+
 export const listingsApi = {
   getListings: async (params: Record<string, any>) => {
     const res = await apiClient.get<PaginatedResponse<Listing>>('/v1/listings', { params });
@@ -9,7 +12,7 @@ export const listingsApi = {
   getListing: async (id: string) => {
     const res = await apiClient.get<Listing>(`/v1/listings/${id}`);
     return res.data;
-  }
+  },
 };
 
 export const rentalsApi = {
@@ -20,7 +23,7 @@ export const rentalsApi = {
   getRental: async (id: string) => {
     const res = await apiClient.get<Rental>(`/v1/rentals/${id}`);
     return res.data;
-  }
+  },
 };
 
 export const projectsApi = {
@@ -31,7 +34,7 @@ export const projectsApi = {
   getProject: async (id: string) => {
     const res = await apiClient.get<Project>(`/v1/projects/${id}`);
     return res.data;
-  }
+  },
 };
 
 export const savedApi = {
@@ -46,12 +49,5 @@ export const savedApi = {
   removeSaved: async (listing_id: string) => {
     const res = await apiClient.delete(`/v1/saved/${listing_id}`);
     return res.data;
-  }
+  },
 };
-
-export const analyticsApi = {
-  getSummary: async () => {
-    const res = await apiClient.get('/v1/analytics/summary');
-    return res.data;
-  }
-}

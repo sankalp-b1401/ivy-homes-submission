@@ -23,6 +23,7 @@ import {
   Armchair,
   Layers
 } from 'lucide-react';
+import { isValidListing } from '../utils';
 import { getPropertyImages } from '../utils/propertyImages';
 
 export default function ListingDetail() {
@@ -43,6 +44,13 @@ export default function ListingDetail() {
         setLoading(true);
         if (!id) return;
         const data = await listingsApi.getListing(id);
+
+        if (!isValidListing(data)) {
+          setError('This residence is currently unavailable, inactive, or has been unlisted.');
+          setListing(null);
+          return;
+        }
+
         setListing(data);
         
         const gallery = getPropertyImages(data.listing_id, data.property_type);

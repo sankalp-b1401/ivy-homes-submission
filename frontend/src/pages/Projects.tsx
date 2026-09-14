@@ -16,7 +16,7 @@ import {
   Home 
 } from 'lucide-react';
 import { useLocation, useNavigate, useParams, Link } from 'react-router-dom';
-import { isValidProject } from '../utils';
+import { isValidProject, formatPriceRange } from '../utils';
 import { getPropertyImages } from '../utils/propertyImages';
 import { PropertyGridSkeleton } from '../components/PropertySkeleton';
 import { ProjectUnitsExplorer } from '../components/ProjectUnitsExplorer';
@@ -143,14 +143,6 @@ export default function Projects() {
     }
   };
 
-  const formatPriceRange = (min: number, max: number) => {
-    const format = (price: number) => {
-      if (price >= 10000000) return `₹${(price / 10000000).toFixed(2)} Cr`;
-      if (price >= 100000) return `₹${(price / 100000).toFixed(2)} L`;
-      return `₹${price.toLocaleString('en-IN')}`;
-    };
-    return `${format(min)} - ${format(max)}`;
-  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">

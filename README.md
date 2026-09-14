@@ -409,3 +409,32 @@ Here's the framework the LLM and I agreed upon:
 ```
 
 I found out that **59** listings were fake.
+
+## What I Would Do With Another Two Days
+
+If I had two additional days, I would focus on improving completeness, usability, and the relationships between the different types of data rather than introducing major new functionality.
+
+1. **Complete the rentals experience**
+   - Build dedicated rental listing and rental-detail pages.
+   - Add the relevant rental filters, sorting, and navigation.
+   - Make the rental experience consistent with the existing property browsing experience.
+
+2. **Improve project ↔ listing relationships**
+   - Make project pages link more naturally to their associated listings.
+   - Allow users to move from a project to the relevant properties/listings and back.
+   - Improve the presentation of the relationship between a project and its available listings.
+
+3. **Improve search, filtering, and discovery**
+   - Refine the existing search and filtering experience.
+   - Make filter combinations easier to understand and use.
+   - Improve empty states and feedback when no matching properties are available.
+
+4. **Improve performance and API data handling**
+   - Reduce unnecessary API requests and improve caching where appropriate.
+   - Optimize fetching and pagination for pages that work with larger datasets.
+   - Make loading states feel smoother, particularly for analytics and large listing collections.
+
+5. **Add more thorough production testing**
+   - Test all six required functionalities across different edge cases.
+   - Verify invalid, inactive, and unavailable listings cannot leak into user-facing results.
+   - Test the deployed Vercel application across common screen sizes and directly accessed routes.

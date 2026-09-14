@@ -14,7 +14,8 @@ import {
   X,
   ShieldCheck,
   ArrowRight,
-  Shield
+  Shield,
+  Building
 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { isValidRental } from '../utils';
@@ -302,16 +303,29 @@ export default function Rentals() {
                     {/* Card Content */}
                     <div className="p-5 flex-1 flex flex-col justify-between">
                       <div>
-                        <div className="flex items-baseline gap-1 mb-1">
+                        <div className="flex items-baseline gap-1 mb-2">
                           <h3 className="text-2xl font-bold font-display text-stone-900 tracking-tight">
                             {formatPrice(rental.price)}
                           </h3>
                           <span className="text-xs text-stone-500 font-medium">/ month</span>
                         </div>
 
-                        <h4 className="text-sm font-semibold text-stone-800 capitalize line-clamp-1 mb-2">
-                          {rental.title || `${rental.bedroom} BHK in ${rental.locality}`}
-                        </h4>
+                        {/* Apartment Name */}
+                        {rental.apartment_name ? (
+                          <div className="mb-2">
+                            <div className="flex items-center gap-1.5 text-xs font-bold text-[#0D3B2E] mb-0.5">
+                              <Building className="w-3.5 h-3.5 shrink-0 text-[#0D3B2E]" />
+                              <span className="truncate tracking-tight uppercase text-[11px] font-bold">{rental.apartment_name}</span>
+                            </div>
+                            <h4 className="text-sm font-semibold text-stone-800 capitalize line-clamp-1">
+                              {rental.title || `${rental.bedroom} BHK in ${rental.locality}`}
+                            </h4>
+                          </div>
+                        ) : (
+                          <h4 className="text-sm font-semibold text-stone-800 capitalize line-clamp-1 mb-2">
+                            {rental.title || `${rental.bedroom} BHK in ${rental.locality}`}
+                          </h4>
+                        )}
 
                         <div className="flex items-center text-stone-500 text-xs mb-4">
                           <MapPin className="w-3.5 h-3.5 mr-1 text-[#0D3B2E] shrink-0" />
